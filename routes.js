@@ -9,10 +9,16 @@ const appRouter = app => {
    request.get(service_url + cpf, (error, response, body) => {
       console.log("error:", error); // Print the error if one occurred
       console.log("statusCode:", response && response.statusCode); 
-      res.status(200).send(body.cnpj);
-//	body[0].cnpj === cnpj ?  
-  //  res.status(200).send(body[0].cnpj === cnpj) :
-    //res.status(200).send(body[0].cnpj + " \n" + body);
+      
+      const data = JSON.parse(body);
+      const cnpj_from_response = data[0].cnpj;
+      if (cnpj == cnpj_from_response) {
+        res.status(200).send({match:true});
+
+      } else {
+        res.status(200).send({match:false});
+      }
+
     });
   });
 }
