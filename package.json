@@ -1,0 +1,22 @@
+{
+  "name": "cpe_app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^3.0.3",
+    "axios": "^0.18.0",
+    "chokidar": "^2.0.4",
+    "lodash.isempty": "^4.4.0",
+    "lodash.isnil": "^4.0.0",
+    "react": "^16.5.0",
+    "react-dom": "^16.5.0",
+    "react-scripts": "1.1.5",
+    "react-text-mask": "^5.4.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
