@@ -12,16 +12,18 @@ const appRouter = app => {
       console.log("statusCode:", response && response.statusCode);
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      if (response.statusCode === 403) {
-        res.status(200).send({match: false});
-    } else if (response.statusCode === 200 && !isEmpty(body)) {
-      const data = JSON.parse(body);
-      const cnpj_from_response = data[0].cnpj;   
-      console.log(cnpj_from_response)
-      res.status(200).send({ match: cnpj === cnpj_from_response});
-      } else {  
-        res.status(200).send({match: false})
+      if (response) {
+        if (response.statusCode === 403) {
+          res.status(200).send({match: false});
+      } else if (response.statusCode === 200 && !isEmpty(body)) {
+        const data = JSON.parse(body);
+        const cnpj_from_response = data[0].cnpj;   
+        res.status(200).send({ match: cnpj === cnpj_from_response});
+        } else {  
+          res.status(200).send({match: false})
+        }
       }
+      
     });
   });
 };
