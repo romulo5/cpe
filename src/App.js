@@ -144,7 +144,7 @@ class App extends Component {
 
   checkCNPJwithCPF = (rawCPF, rawCNPJ) => {
     const url =
-      "https://apicpe.sebrae.com.br/v1/pessoasjuridicas/cpf-responsavel/";
+      "http://api-vinculosocietario.sebrae.com.br/";
     const cpf = this.sanitize(rawCPF);
     const cnpj = this.sanitize(rawCNPJ);
     const updateState = (field, value) => {
@@ -153,20 +153,22 @@ class App extends Component {
       });
     };
     axios
-      .get(url + cpf)
+      .get(url + "?cpf=" + cpf + "?cnpj=" + cnpj)
       .then(function(response) {
-        const cnpjFromServer = !isEmpty(response.data)
-          ? response.data[0].cnpj
-          : "";
-        console.log(cnpjFromServer);
+        const match = response.data.match 
+        console.log(response.data)
+        // const cnpjFromServer = !isEmpty(response.data)
+        //   ? response.data[0].cnpj
+        //   : "";
+        // console.log(cnpjFromServer);
       
-        if (cnpj === cnpjFromServer) {
-          updateState("match", true);
-          updateState("loaded", true);
-        } else {
-          updateState("loaded", true);
-          updateState("match", false);
-        }
+        // if (cnpj === cnpjFromServer) {
+        //   updateState("match", true);
+        //   updateState("loaded", true);
+        // } else {
+        //   updateState("loaded", true);
+        //   updateState("match", false);
+        // }
      
         
       })
