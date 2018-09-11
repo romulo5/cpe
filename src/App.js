@@ -153,24 +153,10 @@ class App extends Component {
       });
     };
     axios
-      .get(url + "?cpf=" + cpf + "?cnpj=" + cnpj)
+      .get(url + "?cpf=" + cpf + "&cnpj=" + cnpj)
       .then(function(response) {
-        const match = response.data.match 
-        console.log(response.data)
-        // const cnpjFromServer = !isEmpty(response.data)
-        //   ? response.data[0].cnpj
-        //   : "";
-        // console.log(cnpjFromServer);
-      
-        // if (cnpj === cnpjFromServer) {
-        //   updateState("match", true);
-        //   updateState("loaded", true);
-        // } else {
-        //   updateState("loaded", true);
-        //   updateState("match", false);
-        // }
-     
-        
+        updateState("match", response.data.match) 
+        updateState("loaded", true)    
       })
       .catch(function(error) {})
       .then(function(){
