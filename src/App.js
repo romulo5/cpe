@@ -132,7 +132,8 @@ class App extends Component {
       cnpj: "",
       cpferror: false,
       cnpjerror: false,
-      loading: false
+      loading: false,
+      show: false
     };
     this.baseState = this.state;
   }
@@ -172,6 +173,7 @@ class App extends Component {
       .catch(function(error) {})
       .then(function(){
         updateState("loading", false)
+        updateState("show", true)
       });
   };
 
@@ -205,11 +207,13 @@ class App extends Component {
     const validCpf = validarCpf(this.state.cpf);
     this.setState({
       cpferror: this.state.cpf.length === 0 || this.state.cpf.length < 14 || !validCpf,
-      cnpjerror: this.state.cnpj.length === 0 || this.state.cnpj.length < 18
+      cnpjerror: this.state.cnpj.length === 0 || this.state.cnpj.length < 18,
+      show: false
     });
   };
   render() {
     const { classes } = this.props;
+    const validData = !this.state.cpferror && !this.state.cnpjerror;
     return (
       <div className={classes.root}>
         <Grid container spacing={16}>
@@ -274,10 +278,14 @@ class App extends Component {
               </form>
               <Grid item xs={4}>
               {this.state.loading &&  <LinearProgress variant="query" />}
-              {this.state.match && 
-              this.state.loaded && <h4>CPF e CNPJ vinculados</h4>}
-              {!this.state.match &&
-                this.state.loaded && <h4> CPF e CNPJ não vinculados</h4>}
+              {this.state.show &&
+                this.state.match && 
+              this.state.loaded && 
+              validData && <h4>CPF e CNPJ vinculados</h4>}
+              {this.state.show &&
+                !this.state.match &&
+                this.state.loaded &&
+                 validData && <h4> CPF e CNPJ não vinculados</h4>}
                 </Grid>
             </Paper>
           </Grid>
