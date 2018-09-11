@@ -10,7 +10,6 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from "axios";
-import isEmpty from "lodash.isempty";
 import validarCpf from './validar'
 import 'typeface-roboto'
 import logo from "./logo.jpg";
