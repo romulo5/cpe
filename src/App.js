@@ -8,14 +8,15 @@ import MaskedInput from "react-text-mask";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
-import logo from "./logo.jpg"
 import axios from "axios";
-import isNil from 'lodash.isnil';
-import isEmpty from 'lodash.isempty';
+import isEmpty from "lodash.isempty";
+import validarCpf from 'validar-cpf'
+import 'typeface-roboto'
+import logo from "./logo.jpg";
 
 const styles = theme => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   paper: {
     padding: theme.spacing.unit * 2,
@@ -38,6 +39,13 @@ const styles = theme => ({
     margin: theme.spacing.unit,
     width: 100,
     height: "80%"
+  },
+  formControl: {
+   
+  },
+  error: {
+    paddingLeft: theme.spacing.unit,
+    color: 'red'
   }
 });
 
@@ -85,22 +93,22 @@ function TextMaskCNPJ(props) {
       mask={[
         /\d/,
         /\d/,
-        '.',
+        ".",
         /\d/,
         /\d/,
         /\d/,
-        '.',
+        ".",
         /\d/,
         /\d/,
         /\d/,
-        '/',
+        "/",
         /\d/,
         /\d/,
         /\d/,
         /\d/,
-        '-',
+        "-",
         /\d/,
-        /\d/,
+        /\d/
       ]}
       placeholderChar={"\u2000"}
       guide={false}
@@ -113,7 +121,6 @@ TextMaskCNPJ.propTypes = {
   inputRef: PropTypes.func.isRequired
 };
 
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -121,63 +128,82 @@ class App extends Component {
       match: false,
       loaded: false,
       cpf: "",
-      cnpj: ""
+      cnpj: "",
+      cpferror: false,
+      cnpjerror: false
     };
-    this.baseState = this.state 
-  }
-  
-  resetState = () => {
-    this.setState(this.baseState)
-  }
-  checkCNPJwithCPF = (rawCPF,rawCNPJ) => {
-    const url = "https://apicpe.sebrae.com.br/v1/pessoasjuridicas/cpf-responsavel/";
-    const cpf = this.sanitize(rawCPF);
-    const cnpj = this.sanitize(rawCNPJ);
-    const update = (field, value) => {
-      this.setState({
-        [field]: value
-      })
-    }
-    axios.get(url + cpf)
-    .then(function (response) {
-        const cnpjFromServer =  !isEmpty(response.data) ? response.data[0].cnpj : ""; 
-        console.log(cnpjFromServer)
-          if (cnpj === cnpjFromServer){
-            update("match", true);
-            update("loaded", true);
-          } else {
-          update("loaded",true);
-          update("match", false);
-          }
-    })
-    .catch(function (error) {
-    })
-    .then(function () {
-    });  
+    this.baseState = this.state;
   }
 
-  sanitize = (string) => {
-    let s = string.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"");
-    return s.replace(/\s{2,}/g," ");
+  resetState = () => {
+    this.setState({});
   };
-   
+
+  checkCNPJwithCPF = (rawCPF, rawCNPJ) => {
+    const url =
+      "https://apicpe.sebrae.com.br/v1/pessoasjuridicas/cpf-responsavel/";
+    const cpf = this.sanitize(rawCPF);
+    const cnpj = this.sanitize(rawCNPJ);
+    const updateState = (field, value) => {
+      this.setState({
+        [field]: value
+      });
+    };
+    axios
+      .get(url + cpf)
+      .then(function(response) {
+        const cnpjFromServer = !isEmpty(response.data)
+          ? response.data[0].cnpj
+          : "";
+        console.log(cnpjFromServer);
+      
+        if (cnpj === cnpjFromServer) {
+          updateState("match", true);
+          updateState("loaded", true);
+        } else {
+          updateState("loaded", true);
+          updateState("match", false);
+        }
+     
+        
+      })
+      .catch(function(error) {})
+      .then(function() {});
+  };
+
+  sanitize = string => {
+    let s = string.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "");
+    return s.replace(/\s{2,}/g, " ");
+  };
+
   handleChange = name => event => {
     event.preventDefault();
     this.setState({
       [name]: event.target.value
     });
   };
-  handleSubmit = (event) => {
-    event.preventDefault();
-    this.checkCNPJwithCPF(this.state.cpf,this.state.cnpj)
- }
 
- componentWillUnmount() {
-  this.resetState();
-}
+  handleSubmit = event => {
+    event.preventDefault();
+    if (!this.state.cpferror && !this.state.cnpjerror) {
+      this.checkCNPJwithCPF(this.state.cpf, this.state.cnpj);
+    }
+  };
+
+  componentWillUnmount() {
+    this.resetState();
+  }
+
+  validate = () => {
+    const validCpf = validarCpf(this.state.cpf);
+    this.setState({
+      cpferror: this.state.cpf.length === 0 || this.state.cpf.length < 14 || !validCpf,
+      cnpjerror: this.state.cnpj.length === 0 || this.state.cnpj.length < 18
+    });
+  };
   render() {
     const { classes } = this.props;
-      return (
+    return (
       <div className={classes.root}>
         <Grid container spacing={16}>
           <Grid item xs={12}>
@@ -188,49 +214,61 @@ class App extends Component {
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <h3>Verificar Vínculo - CPF / CNPJ</h3>
-              <br/>
-              <form >
+              <br />
+              <form>
                 <FormControl className={classes.formControl}>
-                  <InputLabel htmlFor="cpf" shrink className={classes.textField}>
+                  <InputLabel
+                    htmlFor="cpf"
+                    shrink
+                    className={classes.textField}
+                  >
                     CPF
                   </InputLabel>
-                  <Input 
+                  <Input
                     id="cpf"
                     className={classes.textField}
                     placeholder="Insira o CPF"
                     onChange={this.handleChange("cpf")}
                     inputComponent={TextMaskCPF}
-                    type='text'
-                    // error={cpf === ""}
-                    // helperText={cpf === "" ? 'Digite um CPF' : ' '}
+                    type="text"
+                    error={this.state.cpferror}
+                    onBlur={this.validate}
                   />
+                  {this.state.cpferror && <h5 className={classes.error}>CPF inválido</h5>}
                 </FormControl>
                 <FormControl className={classes.formControl}>
-                  <InputLabel htmlFor="cnpj" shrink className={classes.textField}>
-                   CNPJ
+                  <InputLabel
+                    htmlFor="cnpj"
+                    shrink
+                    className={classes.textField}
+                  >
+                    CNPJ
                   </InputLabel>
                   <Input
-                  id="CNPJ"
-                  className={classes.textField}
-                  placeholder="Insira o CNPJ"
-                  onChange={this.handleChange("cnpj")}
-                  inputComponent={TextMaskCNPJ}
-                  // error={cnpj === ""}
-                  // helperText={cnpj === "" ? 'Digite um CNPJ' : ' '}
-                />
+                    id="CNPJ"
+                    className={classes.textField}
+                    placeholder="Insira o CNPJ"
+                    onChange={this.handleChange("cnpj")}
+                    inputComponent={TextMaskCNPJ}
+                    error={this.state.cnpjerror}
+                    onBlur={this.validate}
+                  />
+                  {this.state.cnpjerror && <h5 className={classes.error} >CNPJ inválido</h5>}
                 </FormControl>
                 <Button
                   type="submit"
                   onClick={this.handleSubmit}
                   variant="contained"
                   color="primary"
-                  className={classes.button}               >
+                  className={classes.button}
+                >
                   Enviar
                 </Button>
-                </form>
-             
-               {this.state.match && <h4>CPF e CNPJ vinculados</h4> } 
-               {!this.state.match && this.state.loaded && <h4> CPF e CNPJ não vinculados</h4>}
+              </form>
+              {this.state.match && 
+              this.state.loaded && <h4>CPF e CNPJ vinculados</h4>}
+              {!this.state.match &&
+                this.state.loaded && <h4> CPF e CNPJ não vinculados</h4>}
             </Paper>
           </Grid>
         </Grid>
