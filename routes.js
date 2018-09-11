@@ -15,15 +15,16 @@ const appRouter = app => {
       if (response) {
         if (response.statusCode === 403) {
           res.status(200).send({match: false});
-      } else if (response.statusCode === 200 && !isEmpty(body)) {
+      } else if (response.statusCode === 200) {
         const data = JSON.parse(body);
+	if (data[0] !== undefined) {
         const cnpj_from_response = data[0].cnpj;   
         res.status(200).send({ match: cnpj === cnpj_from_response});
         } else {  
           res.status(200).send({match: false})
         }
       }
-      
+}      
     });
   });
 };
