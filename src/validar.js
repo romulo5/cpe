@@ -5,7 +5,7 @@ const validarCpf = input => {
 		return false
 	}
 
-	const digits = cpf.split('').map(x => parseInt(x))
+	const digits = cpf.split('').map(x => parseInt(x, 10));
 
 	for (let j = 0; j < 2; j++) {
 		let sum = 0

@@ -8,6 +8,7 @@ import MaskedInput from "react-text-mask";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
+import LinearProgress from '@material-ui/core/LinearProgress';
 import axios from "axios";
 import isEmpty from "lodash.isempty";
 import validarCpf from './validar'
@@ -130,7 +131,8 @@ class App extends Component {
       cpf: "",
       cnpj: "",
       cpferror: false,
-      cnpjerror: false
+      cnpjerror: false,
+      loading: false
     };
     this.baseState = this.state;
   }
@@ -168,7 +170,9 @@ class App extends Component {
         
       })
       .catch(function(error) {})
-      .then(function() {});
+      .then(function(){
+        updateState("loading", false)
+      });
   };
 
   sanitize = string => {
@@ -186,6 +190,9 @@ class App extends Component {
   handleSubmit = event => {
     event.preventDefault();
     if (!this.state.cpferror && !this.state.cnpjerror) {
+      this.setState({
+        loading:true
+      })
       this.checkCNPJwithCPF(this.state.cpf, this.state.cnpj);
     }
   };
@@ -265,10 +272,13 @@ class App extends Component {
                   Enviar
                 </Button>
               </form>
+              <Grid item xs={4}>
+              {this.state.loading &&  <LinearProgress variant="query" />}
               {this.state.match && 
               this.state.loaded && <h4>CPF e CNPJ vinculados</h4>}
               {!this.state.match &&
                 this.state.loaded && <h4> CPF e CNPJ não vinculados</h4>}
+                </Grid>
             </Paper>
           </Grid>
         </Grid>
