@@ -1,6 +1,6 @@
 const request = require("request");
 const appRouter = app => {
-  app.get("/busca", function(req, res) {
+  app.get("/", function(req, res) {
     const cpf = req.param("cpf");
     const cnpj = req.param("cnpj");
     const service_url =
